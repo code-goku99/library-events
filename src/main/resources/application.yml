@@ -1,8 +1,8 @@
 spring:
   application:
    name: library-events-producer
-   profile:
-     active: local
+  profiles:
+   active: local
 
 server:
   servlet:

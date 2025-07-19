@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.decay.kafka.domain.enums.LibraryEventType.NEW;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -29,6 +31,9 @@ public class LibraryController {
     @PostMapping("/library-events-sync")
     public ResponseEntity<?> postLibraryEvent(@RequestBody @Valid LibraryEvent libraryEvent) {
         log.info("Sync: Before Publishing");
+        if (libraryEvent.libraryEventId() != null && NEW.equals(libraryEvent.libraryEventType())) {
+            throw new RuntimeException("Incompatable NEW event type for id " + libraryEvent.libraryEventId());
+        }
         libraryEventsProducerImpl.publishMessageSynchronously(libraryEvent);
         log.info("Sync:After Publishing");
         return ResponseEntity.status(HttpStatus.CREATED).body(libraryEvent);
